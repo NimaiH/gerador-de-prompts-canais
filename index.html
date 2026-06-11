@@ -1,66 +1,755 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador de Prompts - Criadores</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerador de Prompts — Canais</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --bg:        #080e1a;
+    --surface:   #0d1726;
+    --card:      #111e30;
+    --card-alt:  #0a1520;
+    --border:    #1a2f4a;
+    --border-hi: #0e4a6e;
+    --cyan:      #00d4ff;
+    --cyan-dim:  #0099bb;
+    --cyan-glow: rgba(0,212,255,0.12);
+    --cyan-glow2:rgba(0,212,255,0.06);
+    --text:      #e8f4f8;
+    --muted:     #5a8099;
+    --muted-hi:  #8ab8cc;
+    --green:     #00e5a0;
+    --green-dim: #009966;
+    --amber:     #ffb020;
+    --r: 10px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+
+  /* ── HEADER ─────────────────────────────── */
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+  .header-eyebrow {
+    font-size: .7rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: .6rem;
+    font-weight: 600;
+  }
+  .header h1 {
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.15;
+  }
+  .header h1 span { color: var(--cyan); }
+  .header p {
+    color: var(--muted-hi);
+    margin-top: .6rem;
+    font-size: .9rem;
+  }
+
+  /* ── WRAPPER ─────────────────────────────── */
+  .wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  /* ── CARD ─────────────────────────────────── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 1.5rem;
+  }
+  .card-title {
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  .card-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── STEP GRID ──────────────────────────── */
+  .step-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .75rem;
+  }
+  @media (max-width: 480px) { .step-grid { grid-template-columns: 1fr; } }
+
+  /* ── PILL SELECTOR ──────────────────────── */
+  .pill-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+  }
+  .pill {
+    padding: .45rem 1rem;
+    border-radius: 999px;
+    border: 1px solid var(--border-hi);
+    background: var(--card-alt);
+    color: var(--muted-hi);
+    font-size: .82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .18s;
+    user-select: none;
+  }
+  .pill:hover { border-color: var(--cyan-dim); color: var(--text); }
+  .pill.active {
+    background: var(--cyan-glow);
+    border-color: var(--cyan);
+    color: var(--cyan);
+    box-shadow: 0 0 12px var(--cyan-glow);
+  }
+
+  /* ── LABEL / INPUT ──────────────────────── */
+  .field-label {
+    display: block;
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--muted-hi);
+    margin-bottom: .5rem;
+    letter-spacing: .04em;
+  }
+  textarea.field-input {
+    width: 100%;
+    padding: .8rem 1rem;
+    background: var(--card-alt);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: .9rem;
+    resize: vertical;
+    transition: border-color .18s;
+    line-height: 1.5;
+  }
+  textarea.field-input:focus {
+    outline: none;
+    border-color: var(--cyan-dim);
+    box-shadow: 0 0 0 3px var(--cyan-glow2);
+  }
+  textarea.field-input::placeholder { color: var(--muted); }
+
+  /* ── NETWORKS ───────────────────────────── */
+  .network-item {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .65rem .9rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--card-alt);
+    cursor: pointer;
+    transition: all .18s;
+    user-select: none;
+  }
+  .network-item:hover { border-color: var(--cyan-dim); }
+  .network-item.active {
+    border-color: var(--cyan);
+    background: var(--cyan-glow);
+    box-shadow: 0 0 10px var(--cyan-glow);
+  }
+  .network-icon { font-size: 1.2rem; line-height: 1; }
+  .network-label { font-size: .85rem; font-weight: 600; color: var(--text); }
+  .network-sub { font-size: .72rem; color: var(--muted); margin-top: .1rem; }
+  .network-item.active .network-label { color: var(--cyan); }
+
+  /* ── TOGGLE SWITCH ──────────────────────── */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .8rem 1rem;
+    background: var(--card-alt);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .toggle-row-text { font-size: .88rem; font-weight: 500; }
+  .toggle-row-sub { font-size: .75rem; color: var(--muted); margin-top: .15rem; }
+  .switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute; inset: 0;
+    background: var(--border);
+    border-radius: 999px;
+    transition: .2s;
+  }
+  .slider::before {
+    content: '';
+    position: absolute;
+    width: 16px; height: 16px;
+    left: 3px; top: 3px;
+    background: var(--muted-hi);
+    border-radius: 50%;
+    transition: .2s;
+  }
+  input:checked + .slider { background: var(--cyan-dim); }
+  input:checked + .slider::before { transform: translateX(18px); background: var(--cyan); }
+
+  /* ── GENERATE BUTTON ────────────────────── */
+  .btn-generate {
+    width: 100%;
+    padding: 1rem;
+    background: var(--cyan);
+    color: #080e1a;
+    border: none;
+    border-radius: var(--r);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: .04em;
+    transition: all .2s;
+    box-shadow: 0 0 20px rgba(0,212,255,.25);
+  }
+  .btn-generate:hover {
+    background: #22e5ff;
+    box-shadow: 0 0 30px rgba(0,212,255,.4);
+    transform: translateY(-1px);
+  }
+  .btn-generate:active { transform: translateY(0); }
+
+  /* ── RESULTS ─────────────────────────────── */
+  .results-section { display: none; flex-direction: column; gap: 1rem; }
+  .results-section.visible { display: flex; }
+
+  .results-header {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .75rem 1.25rem;
+    background: var(--cyan-glow);
+    border: 1px solid var(--cyan-dim);
+    border-radius: var(--r);
+  }
+  .results-header-icon { font-size: 1.1rem; }
+  .results-header-text { font-size: .9rem; font-weight: 600; color: var(--cyan); }
+  .results-header-sub { font-size: .75rem; color: var(--muted-hi); margin-top: .1rem; }
+
+  /* ── NETWORK BLOCK ──────────────────────── */
+  .net-block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    overflow: hidden;
+  }
+  .net-block-header {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .9rem 1.25rem;
+    background: var(--card-alt);
+    border-bottom: 1px solid var(--border);
+  }
+  .net-block-icon { font-size: 1.1rem; }
+  .net-block-name { font-size: .85rem; font-weight: 700; color: var(--text); }
+  .net-block-body { padding: 1rem 1.25rem; display: flex; flex-direction: column; gap: .75rem; }
+
+  /* ── PROMPT CARD ────────────────────────── */
+  .prompt-card {
+    background: var(--card-alt);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .prompt-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .55rem .9rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .prompt-card-label {
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted-hi);
+  }
+  .btn-copy {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .3rem .75rem;
+    background: transparent;
+    border: 1px solid var(--border-hi);
+    border-radius: 999px;
+    color: var(--muted-hi);
+    font-size: .72rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .18s;
+    white-space: nowrap;
+  }
+  .btn-copy:hover {
+    border-color: var(--cyan);
+    color: var(--cyan);
+    background: var(--cyan-glow2);
+  }
+  .btn-copy.copied {
+    border-color: var(--green);
+    color: var(--green);
+    background: rgba(0,229,160,.08);
+  }
+  .prompt-card-body {
+    padding: .85rem .9rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .78rem;
+    line-height: 1.65;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 220px;
+    overflow-y: auto;
+  }
+  .prompt-card-body::-webkit-scrollbar { width: 4px; }
+  .prompt-card-body::-webkit-scrollbar-track { background: transparent; }
+  .prompt-card-body::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 2px; }
+
+  /* ── THUMB BLOCK ─────────────────────────── */
+  .thumb-block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    overflow: hidden;
+  }
+  .thumb-block-header {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .9rem 1.25rem;
+    background: rgba(255,176,32,.06);
+    border-bottom: 1px solid var(--border);
+  }
+  .thumb-block-name { font-size: .85rem; font-weight: 700; color: var(--amber); }
+  .thumb-block-body { padding: 1rem 1.25rem; display: flex; flex-direction: column; gap: .75rem; }
+
+  /* ── HIDDEN ──────────────────────────────── */
+  .hidden { display: none !important; }
+
+  /* ── DIVIDER ─────────────────────────────── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: .25rem 0;
+  }
+
+  /* ── SCROLLBAR GLOBAL ───────────────────── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 3px; }
+</style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>⚡ Gerador de Prompts</h1>
-            <p>Automatize a criação de conteúdo para seus canais.</p>
-        </header>
 
-        <main>
-            <div class="form-group">
-                <label for="channel">1. Qual é o Canal?</label>
-                <select id="channel">
-                    <option value="Gameplay">Canal de Gameplay</option>
-                    <option value="Mind (Desenvolvimento Pessoal e Ideias)">Canal Mind (Desenvolvimento Pessoal)</option>
-                </select>
-            </div>
+<div class="header">
+  <p class="header-eyebrow">Agência O Corre</p>
+  <h1>Gerador de <span>Prompts</span></h1>
+  <p>Crie prompts otimizados para cada rede em segundos.</p>
+</div>
 
-            <div class="form-group">
-                <label for="subject">2. Sobre o que é o vídeo/post?</label>
-                <textarea id="subject" rows="4" placeholder="Ex: Como vencer o boss final de Elden Ring. Os pontos principais são: espada de fogo, esquivar..." autocomplete="off"></textarea>
-            </div>
+<div class="wrap">
 
-            <div class="form-group" id="network-group">
-                <label for="network">3. Para qual Rede Social?</label>
-                <select id="network">
-                    <option value="youtube">YouTube</option>
-                    <option value="tiktok">TikTok</option>
-                    <option value="meta">Facebook & Instagram (Meta)</option>
-                </select>
-            </div>
+  <!-- STEP 1: CANAL -->
+  <div class="card">
+    <div class="card-title">Canal</div>
+    <div class="pill-group" id="channel-group">
+      <div class="pill active" data-value="Gameplay" onclick="selectPill(this,'channel-group')">🎮 Gameplay</div>
+      <div class="pill" data-value="Mind (Desenvolvimento Pessoal e Ideias)" onclick="selectPill(this,'channel-group')">🧠 Mind</div>
+    </div>
+  </div>
 
-            <div class="form-group checkbox-group">
-                <input type="checkbox" id="include-thumb" onchange="toggleThumbOptions()">
-                <label for="include-thumb">4. Gerar também um prompt para Thumbnail?</label>
-            </div>
+  <!-- STEP 2: ORIENTAÇÃO -->
+  <div class="card">
+    <div class="card-title">Formato do vídeo</div>
+    <div class="pill-group" id="orient-group">
+      <div class="pill active" data-value="horizontal" onclick="selectPill(this,'orient-group'); onOrientChange()">📺 Horizontal (16:9)</div>
+      <div class="pill" data-value="vertical" onclick="selectPill(this,'orient-group'); onOrientChange()">📱 Vertical (9:16)</div>
+    </div>
+  </div>
 
-            <div class="form-group hidden" id="orientation-group">
-                <label for="orientation">Orientação da Thumbnail</label>
-                <select id="orientation">
-                    <option value="Horizontal (16:9)">Horizontal (YouTube, Facebook padrão)</option>
-                    <option value="Vertical (9:16)">Vertical (TikTok, Reels, Shorts)</option>
-                </select>
-            </div>
+  <!-- STEP 3: REDES SOCIAIS -->
+  <div class="card">
+    <div class="card-title">Redes sociais</div>
+    <p class="field-label" style="margin-bottom:.75rem">Selecione uma ou mais redes para gerar os prompts</p>
+    <div id="networks-wrap" style="display:flex;flex-direction:column;gap:.5rem">
 
-            <button type="button" onclick="generatePrompt()" class="btn-generate">Gerar Prompt Mestre</button>
+      <div class="network-item active" data-net="youtube" onclick="toggleNetwork(this)">
+        <div class="network-icon">▶️</div>
+        <div>
+          <div class="network-label">YouTube</div>
+          <div class="network-sub">Título · Descrição · Tags · Comentário fixado</div>
+        </div>
+      </div>
 
-            <div class="result-area">
-                <div class="result-header">
-                    <h3>Cole este prompt na IA:</h3>
-                    <button type="button" onclick="copyToClipboard()" class="btn-copy">Copiar</button>
-                </div>
-                <textarea id="result" rows="12" readonly placeholder="Seu prompt aparecerá aqui..."></textarea>
-            </div>
-        </main>
+      <div id="net-tiktok-row" class="network-item" data-net="tiktok" onclick="toggleNetwork(this)">
+        <div class="network-icon">🎵</div>
+        <div>
+          <div class="network-label">TikTok</div>
+          <div class="network-sub">Cópia única otimizada para o algoritmo</div>
+        </div>
+      </div>
+
+      <div class="network-item" data-net="meta" onclick="toggleNetwork(this)">
+        <div class="network-icon">📘</div>
+        <div>
+          <div class="network-label">Facebook & Instagram</div>
+          <div class="network-sub">Cópia única · horizontal e vertical</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- STEP 4: ASSUNTO -->
+  <div class="card">
+    <div class="card-title">Assunto do vídeo/post</div>
+    <label class="field-label" for="subject">Descreva o conteúdo, os pontos principais e qualquer detalhe relevante</label>
+    <textarea class="field-input" id="subject" rows="5" placeholder="Ex: Como vencer o boss final de Elden Ring. Os pontos principais são: espada de fogo, esquivar no momento certo, usar Mimic Tear..."></textarea>
+  </div>
+
+  <!-- STEP 5: THUMBNAIL -->
+  <div class="card">
+    <div class="card-title">Thumbnail</div>
+    <label class="toggle-row" for="thumb-toggle" style="margin-bottom:.75rem">
+      <div>
+        <div class="toggle-row-text">Gerar prompt de Thumbnail?</div>
+        <div class="toggle-row-sub">Cria um prompt em inglês para Midjourney / DALL·E</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="thumb-toggle" onchange="onThumbToggle()">
+        <span class="slider"></span>
+      </label>
+    </label>
+
+    <div id="thumb-orient-wrap" class="hidden">
+      <div class="divider" style="margin-bottom:.75rem"></div>
+      <label class="field-label">Orientação da thumbnail</label>
+      <div class="pill-group" id="thumb-orient-group">
+        <div class="pill active" data-value="Horizontal (16:9)" onclick="selectPill(this,'thumb-orient-group')">📺 Horizontal (16:9)</div>
+        <div class="pill" data-value="Vertical (9:16)" onclick="selectPill(this,'thumb-orient-group')">📱 Vertical (9:16)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GERAR -->
+  <button class="btn-generate" onclick="generateAll()">⚡ Gerar Prompts</button>
+
+  <!-- ── RESULTS ───────────────────────────── -->
+  <div class="results-section" id="results">
+
+    <div class="results-header">
+      <div class="results-header-icon">✅</div>
+      <div>
+        <div class="results-header-text">Prompts gerados com sucesso</div>
+        <div class="results-header-sub">Clique em "Copiar" em cada bloco para usar direto na IA ou na rede social.</div>
+      </div>
     </div>
 
-    <script src="script.js"></script>
+    <div id="results-body"></div>
+
+  </div>
+
+</div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────
+const state = {
+  channel: 'Gameplay',
+  orient: 'horizontal',
+  networks: new Set(['youtube']),
+  thumb: false,
+  thumbOrient: 'Horizontal (16:9)',
+};
+
+// ── PILL SELECT ────────────────────────────────────────
+function selectPill(el, groupId) {
+  document.querySelectorAll(`#${groupId} .pill`).forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  if (groupId === 'channel-group') state.channel = el.dataset.value;
+  if (groupId === 'orient-group')  state.orient  = el.dataset.value;
+  if (groupId === 'thumb-orient-group') state.thumbOrient = el.dataset.value;
+}
+
+// ── NETWORK TOGGLE ─────────────────────────────────────
+function toggleNetwork(el) {
+  const net = el.dataset.net;
+  if (state.networks.has(net)) {
+    if (state.networks.size === 1) return; // mínimo 1
+    state.networks.delete(net);
+    el.classList.remove('active');
+  } else {
+    state.networks.add(net);
+    el.classList.add('active');
+  }
+}
+
+// ── ORIENT CHANGE ──────────────────────────────────────
+function onOrientChange() {
+  // TikTok só aparece em vertical
+  const tiktokRow = document.getElementById('net-tiktok-row');
+  if (state.orient === 'horizontal') {
+    if (state.networks.has('tiktok')) {
+      state.networks.delete('tiktok');
+      tiktokRow.classList.remove('active');
+    }
+    tiktokRow.classList.add('hidden');
+  } else {
+    tiktokRow.classList.remove('hidden');
+  }
+}
+
+// ── THUMB TOGGLE ───────────────────────────────────────
+function onThumbToggle() {
+  state.thumb = document.getElementById('thumb-toggle').checked;
+  const wrap = document.getElementById('thumb-orient-wrap');
+  if (state.thumb) wrap.classList.remove('hidden');
+  else wrap.classList.add('hidden');
+}
+
+// ── PROMPT BUILDERS ────────────────────────────────────
+
+function buildYouTube(channel, subject, orient) {
+  const formatLabel = orient === 'vertical' ? 'Shorts / Vertical' : 'vídeo horizontal';
+  return {
+    titulo: `Aja como um especialista em SEO e psicologia de títulos para YouTube. O canal é "${channel}" e o formato é ${formatLabel}.
+Crie 3 opções de título para o vídeo sobre: "${subject}".
+Regras obrigatórias:
+- Máximo 60 caracteres por título
+- Use gatilhos mentais (curiosidade, urgência, benefício claro)
+- Inclua a palavra-chave principal no início
+- Evite clickbait vazio; o título deve ser honesto e entregar o que promete
+- Formate: Título 1 / Título 2 / Título 3 (um por linha)`,
+
+    descricao: `Aja como um especialista em SEO do YouTube. O canal é "${channel}", o formato é ${formatLabel} e o assunto é: "${subject}".
+Escreva uma descrição otimizada seguindo EXATAMENTE esta estrutura:
+[PARÁGRAFO 1 — Gancho] 2-3 frases que expandem o título, com a palavra-chave principal.
+[PARÁGRAFO 2 — Conteúdo] Resumo do que o espectador vai aprender/ver. Use bullets se necessário.
+[PARÁGRAFO 3 — CTA] Peça inscrição, like e ative o sininho. Mencione comunidade/redes.
+[HASHTAGS] Exatamente 5 hashtags relevantes ao nicho e ao algoritmo do YouTube (ex: #NomeDoCanal #PalavraChave).
+Atenção: as hashtags ficam no final da descrição.`,
+
+    tags: `Aja como um especialista em SEO do YouTube. O canal é "${channel}" e o assunto é: "${subject}".
+Gere uma lista de tags otimizadas para este vídeo.
+Regras obrigatórias:
+- Total de TODOS os caracteres (incluindo vírgulas e espaços) deve ser no MÁXIMO 500 caracteres
+- Separe as tags por vírgula
+- Comece pelas tags mais específicas (long-tail) e vá para as mais amplas
+- Inclua variações da palavra-chave principal, sinônimos e termos relacionados
+- NÃO use hashtags (#), apenas as tags puras
+Entregue APENAS as tags, sem explicações.`,
+
+    comentario: `Aja como um estrategista de engajamento do YouTube. O canal é "${channel}" e o vídeo é sobre: "${subject}".
+Escreva o texto perfeito para o primeiro comentário fixado, que deve:
+- Ter no máximo 3 linhas curtas
+- Criar uma pergunta direta que estimule o espectador a responder nos comentários
+- Pedir like/inscrição de forma natural, sem soar forçado
+- Usar emojis com moderação (máximo 3)
+- Tom de conversa, não de anúncio
+Entregue APENAS o texto do comentário.`
+  };
+}
+
+function buildTikTok(channel, subject) {
+  return `Aja como um especialista no algoritmo do TikTok com foco em retenção e viralizações. O nicho é "${channel}" e o tema é: "${subject}".
+Crie o conteúdo para publicação seguindo EXATAMENTE este formato (entregue pronto para copiar e colar no app):
+
+[LINHA DO TÍTULO] — máximo 1 linha, começa com uma palavra de impacto ou emoji, cria curiosidade imediata, sem ponto final.
+[DESCRIÇÃO] — máximo 2 linhas. Usa linguagem jovem e direta. Complementa o título sem repetir. Pode usar emojis estratégicos.
+[HASHTAGS] — exatamente 5 hashtags: 2 grandes (#fyp, #viral ou similares), 2 do nicho e 1 específica do tema.
+
+Tudo junto em um único bloco de texto para colar direto no TikTok.
+
+---
+Depois, separado, escreva:
+PRIMEIRO COMENTÁRIO: Pergunta provocativa de no máximo 1 linha que incentiva os seguidores a responderem. Deve parecer orgânico, não publicitário.`;
+}
+
+function buildMeta(channel, subject, orient) {
+  const formatNote = orient === 'vertical'
+    ? 'O vídeo é vertical (Reels no Instagram e Facebook). Otimize para Reels.'
+    : 'O vídeo é horizontal. Será postado no Facebook como vídeo padrão e no Instagram como post no feed.';
+  return `Aja como um especialista em algoritmos da Meta (Instagram + Facebook) com foco em alcance orgânico e salvamentos. O nicho é "${channel}", o tema é: "${subject}". ${formatNote}
+Crie o conteúdo para publicação seguindo EXATAMENTE este formato (entregue pronto para copiar e colar):
+
+[PRIMEIRA LINHA] — gera curiosidade ou entrega o benefício imediato. Fundamental: o Instagram corta o texto aqui, então essa linha precisa prender.
+[CORPO DO POST] — 2 a 3 parágrafos curtos, com quebras de linha. Use emojis com moderação. Escreva de forma que o leitor queira salvar o post.
+[CTA] — 1 linha pedindo curtida, comentário ou salvamento de forma natural.
+[HASHTAGS] — exatamente 5 hashtags: 2 amplas do nicho, 2 de tamanho médio e 1 de long-tail específica do tema.
+
+Tudo junto em um único bloco para colar direto no app.
+
+---
+Depois, separado, escreva:
+PRIMEIRO COMENTÁRIO: Pergunta ou provocação de 1-2 linhas que estimula discussão e aparece logo abaixo do post, aumentando o engajamento nos primeiros minutos.`;
+}
+
+function buildThumb(channel, subject, thumbOrient) {
+  return `Aja como Diretor de Arte especializado em thumbnails virais para redes sociais. Crie um prompt detalhado em inglês para gerar uma thumbnail profissional no Midjourney ou DALL·E.
+
+Canal: ${channel}
+Assunto do vídeo: "${subject}"
+Formato: ${thumbOrient}
+
+O prompt deve incluir obrigatoriamente:
+- Descrição da cena central (personagem, expressão, objetos em destaque)
+- Estilo visual (ultra-realista, ilustração, 3D render — escolha o mais adequado ao nicho)
+- Paleta de cores (alto contraste, cores vibrantes que chamam atenção no feed)
+- Iluminação (rim light, dramatic lighting, studio lighting, etc.)
+- Composição (regra dos terços, espaço para texto, foco no elemento principal)
+- Qualidade técnica (4K, sharp focus, professional photography, etc.)
+- Estilo artístico final (ex: cinematic, editorial, hyperrealistic)
+
+Entregue APENAS o prompt em inglês, pronto para colar no Midjourney ou DALL·E, sem explicações adicionais.`;
+}
+
+// ── RENDER ─────────────────────────────────────────────
+
+function mkPromptCard(label, text, id) {
+  return `
+  <div class="prompt-card">
+    <div class="prompt-card-header">
+      <span class="prompt-card-label">${label}</span>
+      <button class="btn-copy" onclick="copyCard('${id}', this)">
+        <span>⎘</span> Copiar
+      </button>
+    </div>
+    <div class="prompt-card-body" id="${id}">${escHtml(text)}</div>
+  </div>`;
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+let cardIndex = 0;
+function uid() { return 'card-' + (++cardIndex); }
+
+function generateAll() {
+  const subject = document.getElementById('subject').value.trim();
+  if (!subject) {
+    alert('Por favor, descreva o assunto do vídeo antes de gerar.');
+    return;
+  }
+
+  const channel = document.querySelector('#channel-group .pill.active').dataset.value;
+  const orient  = document.querySelector('#orient-group .pill.active').dataset.value;
+  const thumbOrient = document.querySelector('#thumb-orient-group .pill.active')?.dataset.value || 'Horizontal (16:9)';
+  const includeThumb = document.getElementById('thumb-toggle').checked;
+
+  let html = '';
+
+  // ── YOUTUBE ──
+  if (state.networks.has('youtube')) {
+    const yt = buildYouTube(channel, subject, orient);
+    html += `
+    <div class="net-block">
+      <div class="net-block-header">
+        <div class="net-block-icon">▶️</div>
+        <div class="net-block-name">YouTube</div>
+      </div>
+      <div class="net-block-body">
+        ${mkPromptCard('Título', yt.titulo, uid())}
+        ${mkPromptCard('Descrição + Hashtags', yt.descricao, uid())}
+        ${mkPromptCard('Tags (máx. 500 caracteres)', yt.tags, uid())}
+        ${mkPromptCard('Primeiro Comentário Fixado', yt.comentario, uid())}
+      </div>
+    </div>`;
+  }
+
+  // ── TIKTOK ──
+  if (state.networks.has('tiktok')) {
+    const tt = buildTikTok(channel, subject);
+    html += `
+    <div class="net-block">
+      <div class="net-block-header">
+        <div class="net-block-icon">🎵</div>
+        <div class="net-block-name">TikTok</div>
+      </div>
+      <div class="net-block-body">
+        ${mkPromptCard('Prompt Completo (título + descrição + hashtags + 1º comentário)', tt, uid())}
+      </div>
+    </div>`;
+  }
+
+  // ── META ──
+  if (state.networks.has('meta')) {
+    const mt = buildMeta(channel, subject, orient);
+    html += `
+    <div class="net-block">
+      <div class="net-block-header">
+        <div class="net-block-icon">📘</div>
+        <div class="net-block-name">Facebook & Instagram</div>
+      </div>
+      <div class="net-block-body">
+        ${mkPromptCard('Prompt Completo (título + corpo + CTA + hashtags + 1º comentário)', mt, uid())}
+      </div>
+    </div>`;
+  }
+
+  // ── THUMBNAIL ──
+  if (includeThumb) {
+    const th = buildThumb(channel, subject, thumbOrient);
+    html += `
+    <div class="thumb-block">
+      <div class="thumb-block-header">
+        <span style="font-size:1.1rem">🖼️</span>
+        <div class="thumb-block-name">Thumbnail — Prompt para IA de Imagem</div>
+      </div>
+      <div class="thumb-block-body">
+        ${mkPromptCard('Prompt em inglês (Midjourney / DALL·E)', th, uid())}
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('results-body').innerHTML = html;
+  const section = document.getElementById('results');
+  section.classList.add('visible');
+  setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+}
+
+// ── COPY ───────────────────────────────────────────────
+function copyCard(id, btn) {
+  const text = document.getElementById(id).innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.classList.add('copied');
+    btn.innerHTML = '<span>✓</span> Copiado!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = '<span>⎘</span> Copiar';
+    }, 2000);
+  });
+}
+</script>
 </body>
 </html>
