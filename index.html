@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Prompts - Criadores</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div  class="container">
+        <header>
+            <h1>⚡ Gerador de Prompts</h1>
+            <p>Automatize a criação de conteúdo para seus canais.</p>
+        </header>
+
+        <main>
+            <div class="from-group">
+                <label for="channel">1. Qual é o seu Canal</label>
+                <select id="channel">
+                    <option value="Gameplay">Canal de Gameplay</option>
+                    <option value="Mind (Desenvolvimento Pessoal e Ideias)">Canal Mind</option>
+                </select>
+            </div>
+            <div class="from-group">
+                <label for="subject">2. Sobre o que é o vídeo/post?</label>
+                <input type="text" id="subject" placeholder="Ex: Gameplay do jogo x" autocomplete="off">            
+            </div>
+
+            <div class="from-group">
+                <label for="network">4. Para qual Rede Social?</label>
+                <select id="network">
+                    <option value="youtube">Youtube</option>
+                    <option value="tiktok">TikTok</option>
+                    <option value="meta">Facebook & Instagram (Meta)</option>
+                </select>
+            </div>
+
+            <div class="from-group hidden" id="orientation-group">
+                <label for="orientation">4. Orientação da Thumbnail</label>
+                <select id="orientation">
+                    <option value="Horizontal (16:9)">Horizontal (Youtube, Facebook padrão)</option>
+                    <option value="Vertical (9:16)">Vertical (Tiktok, Reels, Shorts)</option>
+                </select>
+            </div>
+
+            <button onclick="generatePrompt()" class="btn-generate">Gerar Prompt Mestre/button>
+
+            <div class="result-area">
+                <div class="result-header">
+                    <h3>Cole esse prompt na sua IA</h3>
+                    <button onclick="copyToClipboard()" class="btn-copy">Copiar</button>
+                </div>
+                <textarea id="result" rows="10" readonly placeholder="Seu prompt aparecerá aqui..."></textarea>
+            </div>            
+        </main>
+    </div>
+    
+    <script src="script.js"></script>    
+</body>
+</html>
+
+<!-- Top -->
