@@ -24,19 +24,11 @@
 
             <div class="form-group">
                 <label for="subject">2. Sobre o que é o vídeo/post?</label>
-                <input type="text" id="subject" placeholder="Ex: Como vencer o boss final de Elden Ring..." autocomplete="off">
-            </div>
-
-            <div class="form-group">
-                <label for="goal">3. O que você quer gerar?</label>
-                <select id="goal" onchange="toggleOptions()">
-                    <option value="text">Títulos, Descrições e Tags (Texto)</option>
-                    <option value="thumbnail">Prompt para Thumbnail (Imagem)</option>
-                </select>
+                <textarea id="subject" rows="4" placeholder="Ex: Como vencer o boss final de Elden Ring. Os pontos principais são: espada de fogo, esquivar..." autocomplete="off"></textarea>
             </div>
 
             <div class="form-group" id="network-group">
-                <label for="network">4. Para qual Rede Social?</label>
+                <label for="network">3. Para qual Rede Social?</label>
                 <select id="network">
                     <option value="youtube">YouTube</option>
                     <option value="tiktok">TikTok</option>
@@ -44,26 +36,31 @@
                 </select>
             </div>
 
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="include-thumb" onchange="toggleThumbOptions()">
+                <label for="include-thumb">4. Gerar também um prompt para Thumbnail?</label>
+            </div>
+
             <div class="form-group hidden" id="orientation-group">
-                <label for="orientation">4. Orientação da Thumbnail</label>
+                <label for="orientation">Orientação da Thumbnail</label>
                 <select id="orientation">
                     <option value="Horizontal (16:9)">Horizontal (YouTube, Facebook padrão)</option>
                     <option value="Vertical (9:16)">Vertical (TikTok, Reels, Shorts)</option>
                 </select>
             </div>
 
-            <button onclick="generatePrompt()" class="btn-generate">Gerar Prompt Mestre</button>
+            <button type="button" onclick="generatePrompt()" class="btn-generate">Gerar Prompt Mestre</button>
 
             <div class="result-area">
                 <div class="result-header">
-                    <h3>Cole este prompt no ChatGPT/Claude:</h3>
-                    <button onclick="copyToClipboard()" class="btn-copy">Copiar</button>
+                    <h3>Cole este prompt na IA:</h3>
+                    <button type="button" onclick="copyToClipboard()" class="btn-copy">Copiar</button>
                 </div>
-                <textarea id="result" rows="10" readonly placeholder="Seu prompt aparecerá aqui..."></textarea>
+                <textarea id="result" rows="12" readonly placeholder="Seu prompt aparecerá aqui..."></textarea>
             </div>
         </main>
     </div>
 
     <script src="script.js"></script>
 </body>
-</html> 
+</html>

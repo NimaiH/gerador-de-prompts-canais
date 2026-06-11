@@ -68,10 +68,39 @@ input, select, textarea {
     font-size: 1rem;
 }
 
+textarea {
+    resize: vertical; /* Permite arrastar para aumentar a caixa */
+}
+
 input:focus, select:focus, textarea:focus {
     outline: none;
     border-color: var(--primary);
 }
+
+/* --- Novos Estilos para o Checkbox --- */
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: var(--bg-color);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+.checkbox-group label {
+    margin-bottom: 0; /* Remove a margem do label padrão */
+    cursor: pointer;
+    font-weight: normal;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 1.25rem;
+    height: 1.25rem;
+    cursor: pointer;
+    accent-color: var(--primary); /* Pinta a caixinha de azul quando marcada */
+}
+/* ------------------------------------- */
 
 .btn-generate {
     width: 100%;
@@ -117,8 +146,4 @@ input:focus, select:focus, textarea:focus {
 
 .btn-copy:hover {
     background-color: #059669;
-}
-
-textarea {
-    resize: vertical;
 }
